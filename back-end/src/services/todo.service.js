@@ -1,13 +1,26 @@
-import {todoModel} from "../models/todo.model.js";
+import {todoRepository} from '../repositories/todo.repository.js';
+import { logger } from "../utils/logger.js";
 
 class TodoService {
 
     async createTodo({text}) {
-        return todoModel.create({text});
+        logger.info(`TodoService. Got create todo request`, {text});
+        return todoRepository.create({text});
     }
 
-    getAllTodos() {
-        return todoModel.getAll();
+    async getAllTodos() {
+        return todoRepository.getAll();
+    }
+    getById(id) {
+        logger.info(`TodoService. Get by id request ${id}`);
+        return todoRepository.getById(id);
+    }
+
+    async update(id, todo) {
+        return todoRepository.update(id, todo);
+    }
+    async deleteOne(id) {
+        return todoRepository.deleteOne(id);
     }
 }
 

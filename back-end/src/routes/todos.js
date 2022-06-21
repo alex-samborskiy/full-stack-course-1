@@ -4,23 +4,17 @@ import {todoController} from "../controlers/todo.controller.js";
 const router = express.Router();
 
 // get all todos list
-router.get('/', todoController.getAllTodos);
+router.get('/', todoController.getAllTodos.bind(todoController));
 
 // create new todos
-router.post('/', todoController.createTodo);
+router.post('/', async (req, res) => todoController.createTodo(req, res));
 
 // delete todos by id
-router.delete('/:id', (req, res) => {
-    res.json({
-        test: 'API - test'
-    });
-});
+router.delete('/:id', async (req, res) => todoController.deleteOne(req, res).catch(next));
 
 // edit todos
-router.post('/:id', (req, res) => {
-    res.json({
-        test: 'API - test'
-    });
-});
+router.put('/:id', async (req, res, next) => todoController.update(req, res).catch(next));
+
+router.get('/:id', (req, res, next) => todoController.getById(req, res));
 
 export default router;
