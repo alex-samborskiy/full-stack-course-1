@@ -17,6 +17,10 @@ class AuthRepository {
     logger.info(`AuthRepository. FindOneByEmail request`);
     return Users.findOne({ email });
   }
+  async findOneById(id) {
+    logger.info(`AuthRepository. findOneById request ${id}`);
+    return Users.findOne({ _id: id });
+  }
 }
 
 export const authRepository = new AuthRepository();

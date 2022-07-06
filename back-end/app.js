@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 
 import routes from "./src/routes/index.js";
-import { errorHandler } from "./src/utils/error.middleware.js";
+import { errorHandler } from "./src/middlewares/error.middleware.js";
 import { logger } from "./src/utils/logger.js";
 import { initDB } from "./src/models/db.js";
 import { settings } from "./src/config/settings.js";

@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { settings } from "../config/settings.js";
 import { authRepository } from "../repositories/auth.repository.js";
+import { getToken } from "../utils/common.js";
 import { HTTPError } from "../utils/HttpError.js";
 import { logger } from "../utils/logger.js";
 
@@ -40,8 +41,9 @@ class AuthService {
     return user.getPublickProfile();
   }
   #validate(token) {
-    jwt.verify(token);
+    jwt.verify(token, settings.jwtSecret);
   }
+
   async login({ email, password }) {
     const user = await authRepository.findOneByEmail(email);
     if (!user) {
@@ -56,6 +58,32 @@ class AuthService {
     logger.warn(message("Login request success"), { email });
 
     return { access_token: jwt.sign({ id: user._id }, settings.jwtSecret) };
+  }
+
+  async getUserAndValidateToken(authHeader) {
+    const token = getToken(authHeader);
+    if (!token) {
+      logger.warn("[getUserAndValidateToken] Authentication request failed", {
+        token: token ? "yes" : "no",
+      });
+      throw new HTTPError("Unauthorized", 401);
+    }
+    this.#validate(token);
+    logger.info("[getUserAndValidateToken] token validation passed");
+
+    const { id } = jwt.decode(token);
+    logger.info(`[getUserAndValidateToken] got id from token userId=${id}`);
+
+    const user = await authRepository.findOneById(id);
+    if (!user) {
+      throw new HTTPError("Unauthorized", 401);
+    }
+
+    logger.info(`[getUserAndValidateToken] got User by userId=${id}`, {
+      ...user.getPublickProfile(),
+    });
+
+    return user;
   }
 }
 

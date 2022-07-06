@@ -9,13 +9,13 @@ class TodoController {
   }
   async getAllTodos(req, res) {
     this.log.info("Got getAllTodos request");
-    const todos = await this.service.getAllTodos();
+    const todos = await this.service.getAllTodos({}, req.user);
     res.json(todos);
   }
   // text, isCompleted, id
   async createTodo(req, res) {
     this.log.info("Got createTodo request");
-    const todo = await this.service.createTodo(req.body);
+    const todo = await this.service.createTodo(req.body, req.user);
     res.json(todo);
   }
   async deleteOne(req, res) {
@@ -25,10 +25,10 @@ class TodoController {
     res.json();
   }
 
-  getById(req, res) {
+  async getById(req, res) {
     const id = req.params.id;
     this.log.info("Got getById request", { id: `${id}` });
-    const todo = this.service.getById(id);
+    const todo = await this.service.getById(id, req.user);
     this.log.info("Got response from service", { todo });
 
     res.json(todo);
