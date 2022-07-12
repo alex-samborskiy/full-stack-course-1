@@ -1,20 +1,25 @@
-import React, { useState, useContext, createContext } from "react";
+import React, { useContext, createContext } from "react";
+import { useNavigate } from "react-router-dom";
+
+import { setItem, removeItem, getItem } from "../utils/localStorage";
 
 const authContext = createContext({});
 
 function useProvideAuth() {
-  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   const signIn = ({ email, password }) => {
-    setUser({ email, password });
+    setItem('user', { email, password });
+    navigate("/list", { replace: true });
   };
 
   const singOut = () => {
-    setUser(null);
+    removeItem('user');
+    navigate("/login", { replace: true });
   };
 
   return {
-    user,
+    user: getItem('user'),
     signIn,
     singOut,
   };

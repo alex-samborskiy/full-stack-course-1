@@ -18,14 +18,9 @@ const LoginForm = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-
+    // TODO: login API
     auth.signIn({ email, password });
-    setEmail("");
-    setPassword("");
-  };
 
-  const handleLogout = () => {
-    auth.singOut();
   };
 
   return (
@@ -64,14 +59,6 @@ const LoginForm = () => {
           type="submit"
         >
           Login
-        </button>
-
-        <button
-          disabled={!auth.user}
-          className="login-form__submit-btn"
-          onClick={handleLogout}
-        >
-          Logout
         </button>
       </form>
     </div>

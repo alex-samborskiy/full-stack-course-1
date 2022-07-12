@@ -95,12 +95,17 @@ const List = () => {
     }
   };
 
+  const handleLogout = () => {
+    auth.singOut()
+  }
+
   return (
     <div className="list">
       {auth.user && (
         <div className="list__title">Welcome {auth.user.email}</div>
       )}
 
+      <button onClick={handleLogout}>LogOut</button>
       <CreateItem handleCreate={handleCreate} />
 
       <div className="list__title">TodoList</div>
