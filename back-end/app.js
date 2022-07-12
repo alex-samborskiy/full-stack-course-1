@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.get("/live-check", (req, res) => {
-  logger.log("Info. Got live check request");
+  logger.info("Info. Got live check request");
   res.sendStatus(200);
 });
 
