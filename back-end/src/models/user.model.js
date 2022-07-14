@@ -26,6 +26,9 @@ const userSchema = new Schema(
       isAdmin() {
         return this.role === ROLES.ADMIN;
       },
+      hasRole(role) {
+        return this.role === role;
+      },
     },
   }
 );

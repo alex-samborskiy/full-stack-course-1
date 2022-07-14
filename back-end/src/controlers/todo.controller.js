@@ -9,7 +9,14 @@ class TodoController {
   }
   async getAllTodos(req, res) {
     this.log.info("Got getAllTodos request");
-    const todos = await this.service.getAllTodos({}, req.user);
+    let { page, limit } = req.query;
+    if (page) {
+      page = parseInt(page);
+    }
+    if (limit) {
+      limit = parseInt(limit);
+    }
+    const todos = await this.service.getAllTodos({ page, limit }, req.user);
     res.json(todos);
   }
   // text, isCompleted, id
@@ -21,7 +28,7 @@ class TodoController {
   async deleteOne(req, res) {
     const id = req.params.id;
     this.log.info("Got deleteOne request", { id: `${id}` });
-    await this.service.deleteOne(id);
+    await this.service.deleteOne(id, req.user);
     res.json();
   }
 
@@ -39,10 +46,23 @@ class TodoController {
     const todo = req.body;
     this.log.info("Got update request", { id, todo });
 
-    const newTodo = await this.service.update(id, todo);
+    const newTodo = await this.service.update({
+      id,
+      todoData: todo,
+      user: req.user,
+    });
     this.log.info("Got updated todo", { id, newTodo });
 
     res.json(newTodo);
+  }
+  async searchByText(req, res) {
+    this.log.info("Got queryLike request");
+    const { text } = req.query;
+
+    const result = await this.service.searchByText(text);
+    this.log.info("Got queryLike responce", { result });
+
+    res.json(result);
   }
 }
 
