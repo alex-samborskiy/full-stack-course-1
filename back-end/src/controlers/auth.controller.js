@@ -2,6 +2,12 @@ import { authService } from "../services/auth.service.js";
 import { HTTPError } from "../utils/HttpError.js";
 import { logger } from "../utils/logger.js";
 
+export async function getMe(req, res) {
+  const { user } = req;
+
+  res.json(user.getPublickProfile());
+}
+
 export async function register(req, res) {
   const { firstName, lastName, email, password, confirmPassword, dateOfBirth } =
     req.body;
