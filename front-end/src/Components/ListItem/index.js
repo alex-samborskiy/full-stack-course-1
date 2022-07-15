@@ -1,7 +1,7 @@
 import "./styles.css";
 
 const ListItem = (props) => {
-  const { title, id, isCompleted, handleEdit, handleRemove, handleCheck } =
+  const { text, id, isCompleted, handleEdit, handleRemove, handleCheck } =
     props;
 
   return (
@@ -11,7 +11,7 @@ const ListItem = (props) => {
           isCompleted ? "checked" : null
         }`}
       >
-        {title}
+        {text}
       </p>
       <div className="list-item__btns-wrapper">
         <input

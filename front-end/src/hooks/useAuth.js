@@ -8,18 +8,26 @@ const authContext = createContext({});
 function useProvideAuth() {
   const navigate = useNavigate();
 
-  const signIn = ({ email, password }) => {
-    setItem('user', { email, password });
+  const signIn = (access_token) => {
+    setItem("access_token", access_token);
+    navigate("/list", { replace: true });
+  };
+
+  const addUser = (user) => {
+    setItem("user", user);
     navigate("/list", { replace: true });
   };
 
   const singOut = () => {
-    removeItem('user');
+    removeItem("access_token");
+    removeItem("user");
     navigate("/login", { replace: true });
   };
 
   return {
-    user: getItem('user'),
+    accessToken: getItem("access_token"),
+    user: getItem("user"),
+    addUser,
     signIn,
     singOut,
   };
@@ -27,11 +35,7 @@ function useProvideAuth() {
 
 export function ProvideAuth({ children }) {
   const auth = useProvideAuth();
-  return (
-    <authContext.Provider value={auth}>
-      {children}
-    </authContext.Provider>
-  );
+  return <authContext.Provider value={auth}>{children}</authContext.Provider>;
 }
 
 export const useAuth = () => {

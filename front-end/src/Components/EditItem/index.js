@@ -2,19 +2,19 @@ import { useEffect, useState } from "react";
 import { Modal } from "react-bootstrap";
 import "./styles.css";
 
-const EditItem = ({ show, id, title, handleClose, handleSave }) => {
+const EditItem = ({ show, id, text, handleClose, handleSave }) => {
   useEffect(() => {
-    setNewTitle(title);
-  }, [title]);
+    setNewText(text);
+  }, [text]);
 
-  const [newTitle, setNewTitle] = useState("");
+  const [newText, setNewText] = useState("");
 
-  const onChangeTitle = (e) => {
-    setNewTitle(e.target.value);
+  const onChangeText = (e) => {
+    setNewText(e.target.value);
   };
 
   const handleSubmit = () => {
-    handleSave({ title: newTitle, id });
+    handleSave({ text: newText, id });
   };
 
   return (
@@ -31,10 +31,10 @@ const EditItem = ({ show, id, title, handleClose, handleSave }) => {
             <input
               placeholder="Enter todo"
               className="edit-todo-form__input"
-              id="title"
+              id="text"
               type="text"
-              defaultValue={newTitle}
-              onChange={onChangeTitle}
+              defaultValue={newText}
+              onChange={onChangeText}
             />
           </div>
         </Modal.Body>

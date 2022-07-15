@@ -2,17 +2,17 @@ import { useState } from "react";
 import "./styles.css";
 
 const CreateItem = ({ handleCreate }) => {
-  const [title, setTitle] = useState("");
+  const [text, setText] = useState("");
 
-  const onChangeTitle = (e) => {
-    setTitle(e.target.value);
+  const onChangeText = (e) => {
+    setText(e.target.value);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    handleCreate(title);
-    setTitle("");
+    handleCreate(text);
+    setText("");
   };
 
   return (
@@ -20,19 +20,19 @@ const CreateItem = ({ handleCreate }) => {
       <div className="create-todo-form__title">CreateTodo</div>
       <form onSubmit={handleSubmit}>
         <div className="create-todo-form__input-wrapper">
-          <label className="create-todo-form__input-label" htmlFor="title">
+          <label className="create-todo-form__input-label" htmlFor="text">
             Title:
           </label>
           <input
               placeholder="Enter todo"
             className="create-todo-form__input"
-            id="title"
+            id="text"
             type="text"
-            value={title}
-            onChange={onChangeTitle}
+            value={text}
+            onChange={onChangeText}
           />
         </div>
-        <button disabled={!title.length} className="create-todo-form__submit-btn" type="submit">Submit</button>
+        <button disabled={!text.length} className="create-todo-form__submit-btn" type="submit">Submit</button>
       </form>
     </div>
   );

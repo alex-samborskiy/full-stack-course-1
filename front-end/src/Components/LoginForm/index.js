@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
+import useApi from "../../hooks/useApi";
 
 import "./styles.css";
 
 const LoginForm = () => {
   const auth = useAuth();
+  const api = useApi();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,11 +18,15 @@ const LoginForm = () => {
     setPassword(e.target.value);
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // TODO: login API
-    auth.signIn({ email, password });
 
+    try {
+      const { access_token } = await api.login({ email, password });
+      auth.signIn(access_token);
+    } catch (error) {
+      console.error("error", error);
+    }
   };
 
   return (

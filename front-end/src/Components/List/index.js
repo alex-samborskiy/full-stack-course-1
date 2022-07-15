@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Toast } from "react-bootstrap";
 
 import ListItem from "../ListItem";
@@ -6,51 +6,42 @@ import CreateItem from "../CreateItem";
 import EditItem from "../EditItem";
 import FiltersBar from "../Filters";
 import { useAuth } from "../../hooks/useAuth";
-
+import useApi from "../../hooks/useApi";
 import { FILTERS } from "../../utils";
 
 import "./styles.css";
 
-let initialTodos = [
-  {
-    title: "Lean React",
-    isCompleted: false,
-    id: 1,
-  },
-  {
-    title: "Lean Angular",
-    isCompleted: false,
-    id: 2,
-  },
-  {
-    title: "Lean Vue",
-    isCompleted: false,
-    id: 3,
-  },
-  {
-    title: "Lean Redux",
-    isCompleted: false,
-    id: 4,
-  },
-  {
-    title: "Lean Node",
-    isCompleted: false,
-    id: 5,
-  },
-];
 
 const List = () => {
   const auth = useAuth();
-  const [todos, setTodos] = useState(initialTodos);
+  const api = useApi();
+  const [todos, setTodos] = useState([]);
   const [selectedTodo, setSelectedTodo] = useState(null);
   const [showToast, setShowToast] = useState({ visibility: false, text: "" });
   const [filterType, setFilterType] = useState(FILTERS.ALL);
 
-  const handleCreate = (todo) => {
-    setTodos((prevTodos) => [
-      ...prevTodos,
-      { title: todo, id: prevTodos.length + 1 },
-    ]);
+  useEffect(() => {
+    getUser();
+    getAllTodos();
+  }, []);
+
+  const getUser = async () => {
+    const user = await api.me();
+    auth.addUser(user);
+  };
+
+  const getAllTodos = async () => {
+    const todos = await api.getAllTodos();
+    setTodos(todos.data);
+  };
+
+  const handleCreate = async (todo) => {
+    try {
+      await api.createTodo({ text: todo });
+      getAllTodos();
+    } catch (error) {
+      console.error(error);
+    }
     setShowToast({ visibility: true, text: "Todo successfully created" });
   };
 
@@ -58,9 +49,15 @@ const List = () => {
     setSelectedTodo(todos.find((todo) => todo.id === id));
   };
 
-  const handleSave = ({ id, title }) => {
-    setTodos(todos.map((todo) => (todo.id === id ? { ...todo, title } : todo)));
-    handleClose();
+  const handleSave = async ({ id, text }) => {
+    try {
+      await api.updateTodo(id, { text });
+      getAllTodos();
+      handleClose();
+    } catch (error) {
+      console.error(error);
+      setShowToast({ visibility: true, text: "Failed" });
+    }
     setShowToast({ visibility: true, text: "Todo successfully updated" });
   };
 
@@ -68,17 +65,27 @@ const List = () => {
     setSelectedTodo(null);
   };
 
-  const handleRemove = (id) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
-    setShowToast({ visibility: true, text: "Todo successfully removed" });
+  const handleRemove = async (id) => {
+    try {
+      await api.deleteTodo(id);
+      getAllTodos();
+      setShowToast({ visibility: true, text: "Todo successfully removed" });
+    } catch (error) {
+      console.error(error);
+      setShowToast({ visibility: true, text: "Failed" });
+    }
   };
 
-  const handleCheck = (id) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, isCompleted: true } : todo
-      )
-    );
+  const handleCheck = async (id) => {
+    try {
+      const todo = todos.find((todo) => todo.id === id);
+      await api.updateTodo(id, { isCompleted: !todo?.isCompleted });
+      getAllTodos();
+      handleClose();
+    } catch (error) {
+      console.error(error);
+      setShowToast({ visibility: true, text: "Failed" });
+    }
     setShowToast({ visibility: true, text: "Todo successfully updated" });
   };
 
@@ -95,17 +102,14 @@ const List = () => {
     }
   };
 
-  const handleLogout = () => {
-    auth.singOut()
-  }
-
   return (
     <div className="list">
       {auth.user && (
-        <div className="list__title">Welcome {auth.user.email}</div>
+        <div className="list__title">
+          Welcome {auth.user.firstName} {auth.user.lastName}
+        </div>
       )}
 
-      <button onClick={handleLogout}>LogOut</button>
       <CreateItem handleCreate={handleCreate} />
 
       <div className="list__title">TodoList</div>

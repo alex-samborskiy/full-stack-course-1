@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import useApi from "../../hooks/useApi";
 
 import "./styles.css";
 
 const RegisterForm = () => {
-
   const [form, setForm] = useState({
     firstName: undefined,
     lastName: undefined,
@@ -13,17 +14,28 @@ const RegisterForm = () => {
     dateOfBirth: undefined,
   });
 
+  const api = useApi();
+  const navigate = useNavigate();
+
   const onChangeFormValue = (key, e) => {
-    setForm({ ...form, [key]: e.target.value })
+    setForm({ ...form, [key]: e.target.value });
   };
 
   const validateForm = () => {
-    return Object.values(form).some(item => !item) || form.password !== form.confirmPassword;
-  }
+    return (
+      Object.values(form).some((item) => !item) ||
+      form.password !== form.confirmPassword
+    );
+  };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    // TODO: register API
+    try {
+      await api.register(form);
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error("error", error);
+    }
   };
 
   return (
@@ -40,7 +52,7 @@ const RegisterForm = () => {
             id="email"
             type="text"
             value={form.email}
-            onChange={(e) => onChangeFormValue('email', e)}
+            onChange={(e) => onChangeFormValue("email", e)}
           />
         </div>
         <div className="login-form__input-wrapper">
@@ -53,7 +65,7 @@ const RegisterForm = () => {
             id="password"
             type="text"
             value={form.password}
-            onChange={(e) => onChangeFormValue('password', e)}
+            onChange={(e) => onChangeFormValue("password", e)}
           />
         </div>
         <div className="login-form__input-wrapper">
@@ -66,7 +78,7 @@ const RegisterForm = () => {
             id="confirmPassword"
             type="text"
             value={form.confirmPassword}
-            onChange={(e) => onChangeFormValue('confirmPassword', e)}
+            onChange={(e) => onChangeFormValue("confirmPassword", e)}
           />
         </div>
         <div className="login-form__input-wrapper">
@@ -79,7 +91,7 @@ const RegisterForm = () => {
             id="firstName"
             type="text"
             value={form.firstName}
-            onChange={(e) => onChangeFormValue('firstName', e)}
+            onChange={(e) => onChangeFormValue("firstName", e)}
           />
         </div>
         <div className="login-form__input-wrapper">
@@ -92,7 +104,7 @@ const RegisterForm = () => {
             id="lastName"
             type="text"
             value={form.lastName}
-            onChange={(e) => onChangeFormValue('lastName', e)}
+            onChange={(e) => onChangeFormValue("lastName", e)}
           />
         </div>
         <div className="login-form__input-wrapper">
@@ -105,8 +117,7 @@ const RegisterForm = () => {
             id="dateOfBirth"
             type="text"
             value={form.dateOfBirth}
-            onChange={(e) => onChangeFormValue('dateOfBirth', e)}
-
+            onChange={(e) => onChangeFormValue("dateOfBirth", e)}
           />
         </div>
         <button
