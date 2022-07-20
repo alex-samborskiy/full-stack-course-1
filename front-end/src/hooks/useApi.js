@@ -2,7 +2,7 @@ import axios from "axios";
 import { useAuth } from "./useAuth";
 
 export default function useApi() {
-  const apiUrl = `${process.env.REACT_APP_SERVER_URL}/v1`; // TODO: you should have .env file in /front-end folder. Look at .env.example
+  const apiUrl = `${process.env.NODE_ENV ==="development" ? process.env.REACT_APP_SERVER_URL : window.location.origin + '/api'}/v1`; // TODO: you should have .env file in /front-end folder. Look at .env.example
   const auth = useAuth();
 
   const axiosRequest = async (method, uri, data, headers) => {
