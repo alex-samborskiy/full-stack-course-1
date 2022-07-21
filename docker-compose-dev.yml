@@ -1,0 +1,42 @@
+version: "2"
+
+services:
+  back-end:
+    build:
+      context: ./back-end
+    restart: always
+    command:
+      ["npm", "run", "dev"]
+    environment:
+      MONGO_HOST: mongodb://db
+      JWT_SECRET: sercet
+      LOGDNA_KEY: 7beef7dabe3cc94497fd6148aba2b013
+      PORT: 80
+    depends_on:
+      - db
+    ports:
+      - "3001:80"
+    volumes:
+      - ./back-end/src:/usr/src/app/src
+
+  front-end:
+    build:
+      context: ./front-end
+      args:
+        REACT_APP_SERVER_URL: http://localhost:3001
+      dockerfile: ./Dockerfile.dev
+    restart: always
+    command:
+      [ "npm", "run", "start" ]
+    depends_on:
+      - back-end
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./front-end/src:/usr/src/app/src
+
+  db:
+    image: mongo
+    restart: always
+    volumes:
+      - ./db:/data/db
