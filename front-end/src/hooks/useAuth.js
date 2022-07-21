@@ -13,21 +13,13 @@ function useProvideAuth() {
     navigate("/list", { replace: true });
   };
 
-  const addUser = (user) => {
-    setItem("user", user);
-    navigate("/list", { replace: true });
-  };
-
   const singOut = () => {
     removeItem("access_token");
-    removeItem("user");
     navigate("/login", { replace: true });
   };
 
   return {
     accessToken: getItem("access_token"),
-    user: getItem("user"),
-    addUser,
     signIn,
     singOut,
   };

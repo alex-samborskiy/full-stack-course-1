@@ -5,48 +5,54 @@ import ListItem from "../ListItem";
 import CreateItem from "../CreateItem";
 import EditItem from "../EditItem";
 import FiltersBar from "../Filters";
-import { useAuth } from "../../hooks/useAuth";
+import Pages from "../Pagination";
+
 import useApi from "../../hooks/useApi";
+import useNotifications from "../../hooks/useNotifications";
 import { FILTERS } from "../../utils";
+import useUserData from "../../hooks/useUserData";
 
 import "./styles.css";
 
+const LIMIT = 10;
 
 const List = () => {
-  const auth = useAuth();
   const api = useApi();
-  const [todos, setTodos] = useState([]);
+  const userData = useUserData();
+  const notifications = useNotifications();
+
+  const [todos, setTodos] = useState({
+    data: [],
+    total: undefined,
+    limit: undefined,
+    page: undefined,
+  });
   const [selectedTodo, setSelectedTodo] = useState(null);
   const [showToast, setShowToast] = useState({ visibility: false, text: "" });
   const [filterType, setFilterType] = useState(FILTERS.ALL);
 
   useEffect(() => {
-    getUser();
     getAllTodos();
   }, []);
 
-  const getUser = async () => {
-    const user = await api.me();
-    auth.addUser(user);
-  };
-
-  const getAllTodos = async () => {
-    const todos = await api.getAllTodos();
-    setTodos(todos.data);
+  const getAllTodos = async (page = 1) => {
+    const todos = await api.getAllTodos({ limit: LIMIT, page: page - 1 });
+    setTodos(todos);
   };
 
   const handleCreate = async (todo) => {
     try {
       await api.createTodo({ text: todo });
+      notifications.success({ message: "Todo successfully created" });
       getAllTodos();
     } catch (error) {
       console.error(error);
+      notifications.error({ message: "Failed to crate todo" });
     }
-    setShowToast({ visibility: true, text: "Todo successfully created" });
   };
 
   const handleEdit = (id) => {
-    setSelectedTodo(todos.find((todo) => todo.id === id));
+    setSelectedTodo(todos.data.find((todo) => todo.id === id));
   };
 
   const handleSave = async ({ id, text }) => {
@@ -78,7 +84,7 @@ const List = () => {
 
   const handleCheck = async (id) => {
     try {
-      const todo = todos.find((todo) => todo.id === id);
+      const todo = todos.data.find((todo) => todo.id === id);
       await api.updateTodo(id, { isCompleted: !todo?.isCompleted });
       getAllTodos();
       handleClose();
@@ -92,21 +98,32 @@ const List = () => {
   const filteredTodo = () => {
     switch (filterType) {
       case FILTERS.ALL:
-        return todos;
+        return todos.data;
       case FILTERS.DONE:
-        return todos.filter((todo) => todo.isCompleted);
+        return todos.data.filter((todo) => todo.isCompleted);
       case FILTERS.TODO:
-        return todos.filter((todo) => !todo.isCompleted);
+        return todos.data.filter((todo) => !todo.isCompleted);
       default:
-        return todos;
+        return todos.data;
     }
   };
 
+  const onChangePage = (page) => {
+    if (page === todos.page) return;
+
+    getAllTodos(page);
+  };
+
+  const getPagesCount = () => {
+    return Math.ceil(todos.total / todos.limit);
+  };
+
+  console.log("notifications", notifications);
   return (
     <div className="list">
-      {auth.user && (
+      {userData && (
         <div className="list__title">
-          Welcome {auth.user.firstName} {auth.user.lastName}
+          Welcome {userData.firstName} {userData.lastName}
         </div>
       )}
 
@@ -129,6 +146,12 @@ const List = () => {
           />
         ))}
       </div>
+      <Pages
+        onChange={onChangePage}
+        active={todos.page}
+        pages={getPagesCount()}
+        maxButtons={3}
+      />
       <EditItem
         show={selectedTodo}
         handleClose={handleClose}
